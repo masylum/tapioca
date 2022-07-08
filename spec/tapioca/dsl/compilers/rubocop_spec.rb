@@ -77,25 +77,25 @@ module Tapioca
                 class MyCop
                   sig { params(param0: T.untyped).returns(T.untyped) }
                   def some_matcher(param0 = T.unsafe(nil)); end
-               
+
                   sig { params(param0: T.untyped, param1: T.untyped, two: T.untyped).returns(T.untyped) }
                   def some_matcher_with_params(param0 = T.unsafe(nil), param1, two:); end
-                
+
                   sig { params(args: T.untyped, values: T.untyped).returns(T.untyped) }
                   def some_matcher_with_params_and_defaults(*args, **values); end
-               
+
                   sig { params(param0: T.untyped).returns(T.untyped) }
                   def some_search(param0); end
-               
+
                   sig { params(param0: T.untyped, param1: T.untyped, two: T.untyped).returns(T.untyped) }
                   def some_search_with_params(param0, param1, two:); end
-                
+
                   sig { params(args: T.untyped, values: T.untyped).returns(T.untyped) }
                   def some_search_with_params_and_defaults(*args, **values); end
-               
+
                   sig { params(param0: T.untyped, param1: T.untyped, two: T.untyped).returns(T.untyped) }
                   def without_defaults_some_matcher_with_params_and_defaults(param0 = T.unsafe(nil), param1, two:); end
-               
+
                   sig { params(param0: T.untyped, param1: T.untyped, two: T.untyped).returns(T.untyped) }
                   def without_defaults_some_search_with_params_and_defaults(param0, param1, two:); end
                 end
