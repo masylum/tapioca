@@ -13,9 +13,9 @@ module Tapioca
       # TODO: documentation
       # TODO: Should we call this Rubocop or RuboCop?
       class Rubocop < Compiler
-        GEM_LOAD_PATH_PREFIX_PATTERN = /\A#{Regexp.union(
+        GEM_LOAD_PATH_PREFIX_PATTERN = %r{\A#{Regexp.union(
           ::Gem.loaded_specs.each_value.flat_map(&:load_paths),
-        )}/
+        )}}
 
         ConstantType = type_member { { fixed: T.all(T.class_of(::RuboCop::Cop::Base), Extensions::Rubocop) } }
 
