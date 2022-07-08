@@ -10,6 +10,7 @@ module Tapioca
     module Compilers
       class RubocopSpec < ::DslSpec
         describe "Tapioca::Dsl::Compilers::Rubocop" do
+          sig { void }
           def before_setup
             require "tapioca/dsl/extensions/rubocop"
             super

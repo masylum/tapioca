@@ -17,8 +17,9 @@ module Tapioca
           ::Gem.loaded_specs.each_value.flat_map(&:load_paths),
         )}/
 
-        # TODO: Should this define a CONSTANT_TYPE?
+        ConstantType = type_member { { fixed: T.all(T.class_of(::RuboCop::Cop::Base), Extensions::Rubocop) } }
 
+        sig { override.returns(T::Enumerable[Class]) }
         def self.gather_constants
           descendants_of(::RuboCop::Cop::Base).reject do |constant|
             constant_name = name_of(constant)
@@ -36,6 +37,7 @@ module Tapioca
           end
         end
 
+        sig { override.void }
         def decorate
           return unless used_macros?
 
@@ -52,6 +54,7 @@ module Tapioca
 
         private
 
+        sig { returns(T::Boolean) }
         def used_macros?
           return true unless node_matchers.empty?
           return true unless node_searches.empty?
@@ -59,10 +62,12 @@ module Tapioca
           false
         end
 
+        sig { returns(T::Array[Extensions::Rubocop::MethodName]) }
         def node_matchers
           constant.__tapioca_node_matchers
         end
 
+        sig { returns(T::Array[Extensions::Rubocop::MethodName]) }
         def node_searches
           constant.__tapioca_node_searches
         end
