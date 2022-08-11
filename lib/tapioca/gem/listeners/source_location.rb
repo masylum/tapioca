@@ -7,6 +7,20 @@ module Tapioca
       class SourceLocation < Base
         extend T::Sig
 
+        sig { params(pipeline: Pipeline).void }
+        def initialize(pipeline)
+          super
+
+          # Map each existing file path to the gemspec, so that we can look it up
+          specs = [*::Gem::Specification.default_stubs, *::Gem::Specification.stubs]
+            .map! { |spec| Gemfile::GemSpec.new(spec.to_spec) }
+            .flat_map do |spec|
+              spec.files.map { |file| [file, spec] }
+            end.to_h
+
+          @gem_specs = T.let(specs, T::Hash[String, Gemfile::GemSpec])
+        end
+
         private
 
         sig { override.params(event: ConstNodeAdded).void }
@@ -41,7 +55,6 @@ module Tapioca
         def add_source_location_comment(node, file, line)
           return unless file && line
 
-          gem = @pipeline.gem
           path = Pathname.new(file)
           return unless File.exist?(path)
 
@@ -49,17 +62,26 @@ module Tapioca
           # use for jump to definition. Only add source comments on Ruby files
           return unless path.extname == ".rb"
 
-          path = if path.realpath.to_s.start_with?(gem.full_gem_path)
-            "#{gem.name}-#{gem.version}/#{path.realpath.relative_path_from(gem.full_gem_path)}"
+          gem = @pipeline.gem
+          realpath = path.realpath.to_s
+
+          # If the definition source location is not from the current gem, look for it in dependencies
+          gem = @gem_specs[realpath] unless realpath.start_with?(gem.full_gem_path)
+          return if gem.nil?
+
+          path = if gem.default_gem?
+            "#{gem.name}//#{path.realpath.relative_path_from(RbConfig::CONFIG["rubylibdir"])}"
           else
-            path.sub("#{Bundler.bundle_path}/gems/", "").to_s
+            "#{gem.name}//#{path.realpath.relative_path_from(gem.full_gem_path)}"
           end
 
-          # Strip out the RUBY_ROOT prefix, which is different for each user
-          path = path.sub(RbConfig::CONFIG["rubylibdir"], "RUBY_ROOT")
+          uri = URI("source://#{path}")
+          uri.fragment = line.to_s
 
           node.comments << RBI::Comment.new("") if node.comments.any?
-          node.comments << RBI::Comment.new("source://#{path}:#{line}")
+          node.comments << RBI::Comment.new(uri.to_s)
+        rescue URI::InvalidComponentError, URI::InvalidURIError
+          # Bad uri
         end
       end
     end
