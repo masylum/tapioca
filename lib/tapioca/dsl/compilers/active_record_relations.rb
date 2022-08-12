@@ -231,7 +231,7 @@ module Tapioca
 
           model.create_type_alias(
             'RelationType',
-            "T.any(#{RelationClassName}, #{AssociationRelationClassName}, #{AssociationsCollectionProxyClassName})"
+            "T.any(#{[RelationClassName, AssociationRelationClassName, AssociationsCollectionProxyClassName].join(', ')})"
           )
 
           # This feature is only available in versions of Sorbet with special support for
