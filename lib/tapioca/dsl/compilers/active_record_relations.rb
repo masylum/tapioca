@@ -229,9 +229,14 @@ module Tapioca
           # The model always extends the generated relation module
           model.create_extend(RelationMethodsModuleName)
 
-          model.create_type_alias(
+          classes = [
+            RelationClassName,
+            AssociationRelationClassName,
+            AssociationsCollectionProxyClassName
+          ].join(', ')
+          model.create_constant(
             'RelationType',
-            "T.any(#{[RelationClassName, AssociationRelationClassName, AssociationsCollectionProxyClassName].join(', ')})"
+            value: "T.type_alias { T.any(#{classes}) }"
           )
 
           # This feature is only available in versions of Sorbet with special support for
