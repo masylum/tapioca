@@ -229,6 +229,11 @@ module Tapioca
           # The model always extends the generated relation module
           model.create_extend(RelationMethodsModuleName)
 
+          model.create_type_alias(
+            'RelationType',
+            "T.any(#{RelationClassName}, #{AssociationRelationClassName}, #{AssociationsCollectionProxyClassName})"
+          )
+
           # This feature is only available in versions of Sorbet with special support for
           # handling `NilClass` returns from `to_ary`. We should not be typing `to_ary` like
           # this for older versions since it will make all flatten operations be
